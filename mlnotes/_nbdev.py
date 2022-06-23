@@ -2,9 +2,9 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"say_hello": "00_search.ipynb"}
+index = {}
 
-modules = ["search.py"]
+modules = ["neural_search.py"]
 
 doc_url = "https://mallahyari.github.io/mlnotes/"
 

@@ -1,13 +1,13 @@
 ---
 
-title: Search
+title: Neural Search Engine with transformers
 
 
 keywords: fastai
 sidebar: home_sidebar
 
-summary: "This is search class"
-description: "This is search class"
+summary: "This tutorial demonstrates how to create a search engine with transformers."
+description: "This tutorial demonstrates how to create a search engine with transformers."
 nb_path: "00_search.ipynb"
 ---
 <!--
@@ -29,34 +29,42 @@ nb_path: "00_search.ipynb"
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The diagram below shows the architecture of the system:
+<!-- <img src="images/semantic_search_diagram.png" width="600" height="500" /> --></p>
+<p>{% include image.html width="600" height="500" max-width="600" file="/mlnotes/images/semantic_search_diagram.png" %}</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
-
-<div class="output_wrapper">
-<div class="output">
-
-<div class="output_area">
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<h4 id="say_hello" class="doc_header"><code>say_hello</code><a href="https://github.com/mallahyari/mlnotes/tree/master/mlnotes/search.py#L6" class="source_link" style="float:right">[source]</a></h4><blockquote><p><code>say_hello</code>(<strong><code>to</code></strong>)</p>
-</blockquote>
-<p>Say hello to somebody1</p>
-
-</div>
-
-</div>
-
-</div>
-</div>
 
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Step-0:-Collect-a-dataset">Step 0: Collect a dataset<a class="anchor-link" href="#Step-0:-Collect-a-dataset"> </a></h2><p>I used a dataset that is about startups. Dataset is in json format and each record includes the name, a paragraph describing the company, the location and a picture. The dataset is available at <a href="https://storage.googleapis.com/generall-shared-data/startups_demo.json">this link</a>.</p>
+
+</div>
+</div>
+</div>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">&quot;https://storage.googleapis.com/generall-shared-data/startups_demo.json&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
     {% endraw %}
@@ -68,7 +76,194 @@ nb_path: "00_search.ipynb"
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">say_hello</span><span class="p">(</span><span class="s2">&quot;mehdi&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>images</th>
+      <th>alt</th>
+      <th>description</th>
+      <th>link</th>
+      <th>city</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>SaferCodes</td>
+      <td>https://safer.codes/img/brand/logo-icon.png</td>
+      <td>SaferCodes Logo QR codes generator system form...</td>
+      <td>QR codes systems for COVID-19.\nSimple tools f...</td>
+      <td>https://safer.codes</td>
+      <td>Chicago</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Human Practice</td>
+      <td>https://d1qb2nb5cznatu.cloudfront.net/startups...</td>
+      <td>Human Practice -  health care information tech...</td>
+      <td>Point-of-care word of mouth\nPreferral is a mo...</td>
+      <td>http://humanpractice.com</td>
+      <td>Chicago</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>StyleSeek</td>
+      <td>https://d1qb2nb5cznatu.cloudfront.net/startups...</td>
+      <td>StyleSeek -  e-commerce fashion mass customiza...</td>
+      <td>Personalized e-commerce for lifestyle products...</td>
+      <td>http://styleseek.com</td>
+      <td>Chicago</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We only implement a search mechanism on the <code>description</code> column, i.e. we search and find similar companies based on the similarity of the <em>search query</em> and <em>descriptions</em>.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">corpus</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total number of documents: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Total number of documents: 40474
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>{% include note.html content='Depending on the quality of the documents, we may need to perform some preprocessing such as removing special characters, digits, etc.' %}</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Step-1:-Create-dense-vectors-of-documents-(i.e.-document-embeddings).">Step 1: Create dense vectors of documents (i.e. document embeddings).<a class="anchor-link" href="#Step-1:-Create-dense-vectors-of-documents-(i.e.-document-embeddings)."> </a></h2><p>We need to have an embedding model to create embeddings of our text documents. We use a pretrained language model from the <a href="https://www.sbert.net/docs/pretrained_models.html">Sentence Transformers</a>, specifically we utilize <code>all-distilroberta-v1</code> model as it works very well for semantic search applications.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="s1">&#39;sentence-transformers/all-distilroberta-v1&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">)</span>
+
+<span class="c1"># convert documents into embeddings</span>
+<span class="n">corpus_embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Step-2:-Store-the-embeddings-or-index-the-embeddings">Step 2: Store the embeddings or index the embeddings<a class="anchor-link" href="#Step-2:-Store-the-embeddings-or-index-the-embeddings"> </a></h2><p>In order to be able to perform search and find documents, we need to store document embeddings in a document store. In other words, we have to <code>index</code> them. There are several different ways to do that, nevertheless, I work with Faiss for now.
+Faiss allows us to search through billions of vectors very efficiently. For complete information about Faiss, please check their <a href="https://github.com/facebookresearch/faiss/wiki">wiki</a> page or read their <a href="https://arxiv.org/abs/1702.08734">paper</a>.</p>
+<p>Faiss is built around the <code>Index</code> object, which contains searchable vectors. Faiss handles collections of vectors of a fixed dimensionality <code>d</code>, typically a few 10s to 100s.</p>
+<blockquote><p>Faiss uses only 32-bit floating point matrices. This means we will have to change the data type of the input before building the index.</p>
+</blockquote>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">corpus_embeddings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">embedding</span> <span class="k">for</span> <span class="n">embedding</span> <span class="ow">in</span> <span class="n">corpus_embeddings</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">corpus_embeddings</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 
     </div>
@@ -83,9 +278,172 @@ nb_path: "00_search.ipynb"
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&#39;Hello mehdi!&#39;</pre>
+<pre>(40474, 768)</pre>
 </div>
 
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Shape of embeddings is (40474, 768), so we set the dimension of index to 768.</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">faiss</span><span class="o">.</span><span class="n">IndexFlatL2</span><span class="p">(</span><span class="n">corpus_embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Add the document vectors into the index</span>
+<span class="n">index</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">corpus_embeddings</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Embed-the-search-query">Embed the search query<a class="anchor-link" href="#Embed-the-search-query"> </a></h2><p>Before we search for a query, we must convert the search query into an embedding using the same model we used for document embeddings.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">search_query</span> <span class="o">=</span> <span class="s2">&quot;High-Quality Men&#39;s Accessories&quot;</span>
+
+<span class="c1"># Embed the query</span>
+<span class="n">query_embedding</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">([</span><span class="n">search_query</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Step-4:-Perform-the-search">Step 4: Perform the search<a class="anchor-link" href="#Step-4:-Perform-the-search"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">top_k</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Search function returns two arrays, Distances of the nearest neighbors with shape (n, k), and Labels/ids of the nearest neighbors with shape (n, k).</span>
+<span class="n">distances</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">query_embedding</span><span class="p">),</span> <span class="n">k</span><span class="o">=</span><span class="n">top_k</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[0.6489439  0.7083432  0.75166255 0.8019202  0.8154081  0.82068354
+  0.8472285  0.86972404 0.8702345  0.87548184]] [[24969 17175  6105 28803 15934  1629 15866 19206  5640 28549]]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Step-5:-Display-the-search-results">Step 5: Display the search results<a class="anchor-link" href="#Step-5:-Display-the-search-results"> </a></h2>
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="nb">id</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;===========&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Seasonal Subscription for Men&#39;s Accessories
+Like looking good but hate shopping for good looking things? Each season, we&#39;ll ship you a package of ridiculously cool gear from the hottest up and coming brands.
+You&#39;ll never again worry about finding hats, belts, shades, or ties that match the stuff already ...
+===========
+Leather Accessories for Men
+Premium leather accessories for men.
+===========
+Affordable custom-tailored mens clothing online
+===========
+Fully customizable menswear
+===========
+celebrity driven menswear that understands the moments in a gentleman&#39;s life
+designer tailored casual wear and high end luxury suiting and shirting for men
+===========
+The Manliest Shop on the Web
+- Fitness
+- Gadgets
+- WTF
+- Apparel
+- Electronics
+and more!
+All for Men!
+===========
+Men&#39;s Lifestyle Brand
+A men&#39;s lifestyle brand offering consumers the highest quality products with a fashionable and sophisticated design aesthetic. Gents launched in November 2012 with men&#39;s luxury baseball caps, apparel, and accessories, and an e-commerce custom-build experience.
+===========
+Badass Custom Tailor 
+Lords &amp; Men custom clothiers will visit men at their offices or homes with a selection of suiting and shirting fabrics. The company will also offer accessories such as ties and cufflinks, which carry high profit margin.
+What lacks in the custom tailoring world ...
+===========
+Fully customized made-to-order clothing 
+Custom made-to-order high fashion men’s and women’s clothing, using never seen before material and production techniques. .
+===========
+High end innovative design for consumer electronics accessories.
+===========
+</pre>
+</div>
 </div>
 
 </div>
