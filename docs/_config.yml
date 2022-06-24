@@ -62,7 +62,8 @@ sidebars:
 plugins:
     - jekyll-remote-theme
 
-# theme: just-the-docs    
-remote_theme: fastai/nbdev-jekyll-theme
+
+remote_theme: https://github.com/mallahyari/nbdev-jekyll-theme    
+# remote_theme: fastai/nbdev-jekyll-theme
 # remote_theme: just-the-docs/just-the-docs
 baseurl: /mlnotes/

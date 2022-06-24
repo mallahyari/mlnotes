@@ -11,7 +11,7 @@ entries:
       url: /
     - output: web,pdf
       title: Neural Search Engine with transformers
-      url: search.html
+      url: neural_search.html
     output: web
     title: mlnotes
   output: web
