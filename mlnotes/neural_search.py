@@ -19,24 +19,29 @@ class FaissNeuralSearch:
         # self.model.to(torch.device('cpu'))
         self.corpus = corpus
 
+
     def embed_corpus(self):
         """ convert documents into embeddings. """
         self.corpus_embeddings = self.model.encode(self.corpus, show_progress_bar=False)
 
+
     def convert_to_float32(self):
         """ Convert the data type of the embeddings into float32. """
         self.corpus_embeddings = np.array([embedding for embedding in self.corpus_embeddings]).astype("float32")
+
 
     def build_index(self):
         """ Build the index, and add document embeddings into the index. """
         self.index = faiss.IndexFlatL2(self.corpus_embeddings.shape[1])
         self.index.add(self.corpus_embeddings)
 
+
     def search(self, query, top_k):
         """ Search the index and returns the top-k most similar document ids. """
         query_embedding = self.model.encode([query])
         distances, ids = self.index.search(np.array(query_embedding), k=top_k)
         return distances, ids
+
 
     def show_results(self, ids):
         """ Prints the most similar documents. """
