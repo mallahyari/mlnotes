@@ -433,6 +433,24 @@ Developing a range of connected devices to make data collection for research eas
 </div>
     {% endraw %}
 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Next-Steps">Next Steps<a class="anchor-link" href="#Next-Steps"> </a></h2><p>So far, we have implemented a search engine using Faiss fairly simply. However, There are several directions for improvement.</p>
+<ul>
+<li>Firstly, <code>IndexFlatL2</code> index that we used could be slow for very large datasets as it scales linearly with the number of indexed vectors. That said, Faiss provides <a href="https://github.com/facebookresearch/faiss/wiki/Faster-search">fast indexes</a>.</li>
+<li>We can enhance the quality of the embeddings by using a domain specific pretrained model, which could result in better and more accuarate search results.</li>
+<li>Is it possible to dynamically exclude vectors based on some criterion? What I mean is, what if we would like to search our documents based on some filters, for instance, only search among the companies that are in a specific city. In these cases, there is no easy solution if we want to make use of Faiss index. Therefore, what is the solution? The answer is to apply other approaches. These approaches are, to name a few:<ul>
+<li><a href="https://haystack.deepset.ai/overview/intro">Haystack</a>: An open-source framework for building search systems that work intelligently over large document collections.</li>
+<li><a href="https://github.com/qdrant/qdrant">Qdrant</a>: A Vector Search Engine for the next generation of AI applications.</li>
+<li><a href="https://github.com/semi-technologies/weaviate">Weaviate</a>: Weaviate is a cloud-native, modular, real-time vector search engine</li>
+</ul>
+</li>
+</ul>
+<p>I will create several other examples using these packages and compare them.</p>
+
+</div>
+</div>
+</div>
 </div>
 
 
