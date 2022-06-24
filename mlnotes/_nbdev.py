@@ -2,7 +2,7 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {}
+index = {"FaissNeuralSearch": "00_neural_search.ipynb"}
 
 modules = ["neural_search.py"]
 

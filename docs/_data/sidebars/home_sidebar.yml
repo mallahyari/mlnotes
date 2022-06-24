@@ -10,7 +10,7 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: Neural Search Engine with transformers
+      title: Neural Search Engine with Transformers
       url: neural_search.html
     output: web
     title: mlnotes
