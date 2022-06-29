@@ -2,8 +2,4 @@
 > This library contains all the code and documentation for the mlnotes newsletter.
 
 
-This file will become your README and also the index of your documentation.
-
-## Install
-
-`pip install mlnotes`
+**This website is constantly updated and new materials will be added on a regular basis.**
