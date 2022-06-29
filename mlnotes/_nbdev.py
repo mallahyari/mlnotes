@@ -2,11 +2,9 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"FaissNeuralSearch": "00_neural_search.ipynb",
-         "PDF_DIR_PATH": "01_qa_on_pdf.ipynb"}
+index = {"FaissNeuralSearch": "00_neural_search.ipynb"}
 
-modules = ["neural_search.py",
-           "pdf_qa.py"]
+modules = ["neural_search.py"]
 
 doc_url = "https://mallahyari.github.io/mlnotes/"
 

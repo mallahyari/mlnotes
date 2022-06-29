@@ -12,9 +12,6 @@ entries:
     - output: web,pdf
       title: Neural Search Engine with Transformers
       url: neural_search.html
-    - output: web,pdf
-      title: How to convert pdf documents into a question answering system
-      url: qa_on_pdf.html
     output: web
     title: mlnotes
   output: web

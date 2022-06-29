@@ -1,7 +1,6 @@
 {
   "mlnotes": {
     "Overview": "/",
-    "Neural Search Engine with Transformers": "neural_search.html",
-    "How to convert pdf documents into a question answering system": "qa_on_pdf.html"
+    "Neural Search Engine with Transformers": "neural_search.html"
   }
 }
